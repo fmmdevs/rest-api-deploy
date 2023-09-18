@@ -1,0 +1,88 @@
+GET http://localhost:1234
+
+### Recuperar todas las peliculas
+GET http://localhost:1234/movies
+
+### Recuperar una pelicula por id (miramos las id en el json)
+GET http://localhost:1234/movies/241bf55d-b649-4109-af7c-0e6890ded3fc
+
+### Recuperar peliculas por genero
+# Aquí hay diferentes estrategias, 
+# podemos hacer http:/localhost:1234/movies/genre/1 y tratarlo como un recurso
+# o usando query params http:/localhost:1234/movies?genre=terror
+# Depende de como tu entiendas tu como filtro o un recurso
+# Muchas veces depende de la lógica de negocio
+# Coleccionista de monedas tendra cada moneda como entidad(recurso) vs Tienda tendra moneda como filtro
+# Lo vamos a hacer con query params asi aprendemos 
+# Se procesa en el endpoint /movies
+GET http://localhost:1234/movies?genre=Action&search=Matrix
+### genre lowercase test
+GET http://localhost:1234/movies?genre=action&search=Matrix
+
+### Crear una película, IMPORTANTE Content-Type
+# el rate va a ser opcional
+# la id "obviamente" la creamos nosotros!!!
+POST http://localhost:1234/movies
+Content-Type: application/json
+
+{
+ 
+  "year": 1993,
+  "director": "Henry Selick",
+  "duration": 76,
+  "poster": "https://i.etsystatic.com/24710978/r/il/1856d4/2524194003/il_794xN.2524194003_6kj3.jpg",
+  "genre": ["Animation", "Fantasy"]
+}
+
+### test 1, el campo  sql es para explicar que las apis tienen que ser
+# como un embudo, que acepten todo, pero que solo procesen lo que necesiten
+# que sean robustas, que no fallen por que introducirle un campo inexistente
+POST http://localhost:1234/movies
+Content-Type: application/json
+
+{
+  "sql": "SELECT * FROM users",
+  "title": "Youhaja",
+  "year": 1993,
+  "director": "Harty",
+  "duration": 76,
+  "poster": "https://i.etsystatic.com/24710978/r/il/1856d4/2524194003/il_794xN.2524194003_6kj3.jpg",
+  "genre": ["Animation", "Fantasy"]
+}
+
+### Actualizar una película
+# COMO HAYA UN SALTO DE LINEA ENTRE PATH Y Content-Type
+# NO FUNCIONA! -> Arreglado
+PATCH http://localhost:1234/movies/7e3fd5ab-60ff-4ae2-92b6-9597f0308d1
+Content-Type: application/json
+
+{
+    "year": 2000,
+    "title": "Hola"
+}
+
+### Se guarda nuestro PATCH?  -> si
+GET http://localhost:1234/movies/7e3fd5ab-60ff-4ae2-92b6-9597f0308d1
+
+### Podemos cambiar el id?
+# No ya que no lo estamos validando, es como cuando ponemos por ejemplo
+# el campo sql, que no lo procesa, pero lo demas si
+PATCH http://localhost:1234/movies/7e3fd5ab-60ff-4ae2-92b6-9597f0308d1
+Content-Type: application/json
+
+{
+    "year": 1950,
+    "title": "Holawerfsdaaa",
+    "id": 234234
+}
+
+### Si le pasamos un campo de los que estamos validando, y es invalido
+# no actualiza, devuelve el error concreto de lo que estamos haciendo mal
+PATCH http://localhost:1234/movies/7e3fd5ab-60ff-4ae2-92b6-9597f0308d1
+Content-Type: application/json
+
+{
+    "year": 1970,
+    "title": "Hola123"
+}
+
